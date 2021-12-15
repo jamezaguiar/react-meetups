@@ -1,4 +1,5 @@
 import React from 'react';
+import { MongoClient, ObjectId } from 'mongodb';
 import MeetupDetail from '../../components/meetups/MeetupDetail';
 
 function MeetupDetails(props) {
@@ -16,37 +17,43 @@ function MeetupDetails(props) {
 }
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(process.env.MONGO_URI);
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const findMeetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+
+  client.close();
+
   return {
-    paths: [
-      {
-        params: {
-          meetupId: 'm1',
-        },
-      },
-      {
-        params: {
-          meetupId: 'm2',
-        },
-      },
-    ],
+    paths: findMeetups.map(meetup => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
     fallback: false,
   };
 }
 
 export async function getStaticProps(context) {
   const { meetupId } = context.params;
+  const client = await MongoClient.connect(process.env.MONGO_URI);
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const findMeetup = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  });
+
+  const meetup = {
+    ...findMeetup,
+    _id: findMeetup._id.toString(),
+  };
+
+  client.close();
 
   return {
-    props: {
-      meetup: {
-        id: meetupId,
-        image:
-          'https://cdn.pixabay.com/photo/2014/01/13/04/17/meetup-243206_960_720.jpg',
-        title: 'A First Meetup',
-        description: 'The meetup description',
-        address: 'Some Street 5, Some City',
-      },
-    },
+    props: { meetup },
     revalidate: 3600,
   };
 }

@@ -1,9 +1,19 @@
 import React from 'react';
+import Head from 'next/head';
 import { MongoClient } from 'mongodb';
 import MeetupList from '../components/meetups/MeetupList';
+import CustomHead from '../components/next/CustomHead';
 
 function HomePage(props) {
-  return <MeetupList meetups={props.meetups}></MeetupList>;
+  return (
+    <>
+      <CustomHead
+        title="React Meetups"
+        description="Browse a huge list of highly active React meetups!"
+      />
+      <MeetupList meetups={props.meetups}></MeetupList>
+    </>
+  );
 }
 
 export async function getStaticProps() {

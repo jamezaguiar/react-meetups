@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import NewMeetupForm from '../../components/meetups/NewMeetupForm';
 import { requestMethod } from '../../constants/httpConstants';
+import CustomHead from '../../components/next/CustomHead';
 
 function NewMeetupPage() {
   const router = useRouter();
@@ -22,7 +23,15 @@ function NewMeetupPage() {
     router.push('/');
   }
 
-  return <NewMeetupForm onAddMeetup={addMeetupHandler} />;
+  return (
+    <>
+      <CustomHead
+        title="Add a New Meetup"
+        description="Add your own meetups and create amazing networking oportunities."
+      />
+      <NewMeetupForm onAddMeetup={addMeetupHandler} />
+    </>
+  );
 }
 
 export default NewMeetupPage;
